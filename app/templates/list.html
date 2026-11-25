@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="bar">
+  <h1>{{ t.title }}</h1>
+  <a class="btn" href="{{ url_for('create', name=name) }}">+ Добавить</a>
+</div>
+<div class="scroll">
+<table>
+  <thead>
+    <tr>
+      <th>№</th>
+      {% for c in t.cols %}<th>{{ c.label }}</th>{% endfor %}
+      {% for key, label, expr in t.get('extra', []) %}<th>{{ label }}</th>{% endfor %}
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for r in rows %}
+    <tr>
+      <td>{{ r.id }}</td>
+      {% for c in t.cols %}<td>{{ r[c.name] if r[c.name] is not none else '—' }}</td>{% endfor %}
+      {% for key, label, expr in t.get('extra', []) %}<td>{{ r[key] if r[key] is not none else '—' }}</td>{% endfor %}
+      <td class="actions">
+        <a href="{{ url_for('edit', name=name, row_id=r.id) }}">Изменить</a>
+        <form method="post" action="{{ url_for('delete', name=name, row_id=r.id) }}"
+              onsubmit="return confirm('Удалить запись?');">
+          <button type="submit" class="link-danger">Удалить</button>
+        </form>
+      </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="{{ t.cols|length + 2 }}">Записей пока нет.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}

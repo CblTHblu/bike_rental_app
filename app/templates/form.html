@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ t.title }}: {{ 'новая запись' if new else 'изменение записи' }}</h1>
+<form method="post" class="form">
+  {% for c in t.cols %}
+  <label>
+    <span>{{ c.label }}</span>
+    {% set v = row.get(c.name) %}
+    {% if c.kind == 'fk' %}
+      <select name="{{ c.name }}">
+        <option value="">—</option>
+        {% for o in c.choices %}
+          <option value="{{ o.id }}" {{ 'selected' if v|string == o.id|string else '' }}>{{ o.label }}</option>
+        {% endfor %}
+      </select>
+    {% elif c.kind == 'choice' %}
+      <select name="{{ c.name }}">
+        {% for o in c.options %}
+          <option value="{{ o }}" {{ 'selected' if v == o else '' }}>{{ o }}</option>
+        {% endfor %}
+      </select>
+    {% elif c.kind == 'date' %}
+      <input type="date" name="{{ c.name }}" value="{{ v if v is not none else '' }}">
+    {% elif c.kind == 'time' %}
+      <input type="time" name="{{ c.name }}" value="{{ (v|string)[:5] if v is not none else '' }}">
+    {% elif c.kind == 'number' %}
+      <input type="number" step="0.01" name="{{ c.name }}" value="{{ v if v is not none else '' }}">
+    {% else %}
+      <input type="text" name="{{ c.name }}" value="{{ v if v is not none else '' }}">
+    {% endif %}
+  </label>
+  {% endfor %}
+  <div class="buttons">
+    <button type="submit" class="btn">Сохранить</button>
+    <a href="{{ url_for('listing', name=name) }}">Отмена</a>
+  </div>
+</form>
+{% endblock %}
